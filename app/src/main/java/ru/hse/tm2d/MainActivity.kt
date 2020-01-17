@@ -14,35 +14,33 @@ class MainActivity : AppCompatActivity() {
 
     private var field = TMMap2D()
     private val program = listOf(
-        mapOf(Alphabet.ZERO to Action(Alphabet.ONE, Direction.RIGHT, 0),
-              Alphabet.ONE to Action(Alphabet.ONE, Direction.NONE, TERMINAL_STATE))
+        mapOf(Alphabet.BLANK to Action(Alphabet.ONE, Direction.UP, 0),
+              Alphabet.ZERO to Action(Alphabet.ONE, Direction.RIGHT, 1)),
+        mapOf(Alphabet.BLANK to Action(Alphabet.ONE, Direction.RIGHT, 1),
+            Alphabet.ZERO to Action(Alphabet.ONE, Direction.DOWN, 2)),
+        mapOf(Alphabet.BLANK to Action(Alphabet.ONE, Direction.DOWN, 2),
+            Alphabet.ZERO to Action(Alphabet.ONE, Direction.LEFT, 3)),
+        mapOf(Alphabet.BLANK to Action(Alphabet.ONE, Direction.LEFT, 3),
+            Alphabet.ZERO to Action(Alphabet.ONE, Direction.UP, 4)),
+        mapOf(Alphabet.BLANK to Action(Alphabet.ONE, Direction.UP, 4),
+            Alphabet.ONE to Action(Alphabet.ONE, Direction.NONE, TERMINAL_STATE))
     )
     private var tm = TuringMachine2D(program, field)
 
-    private fun drawFieldDemo() {
-        var text = ""
-        for (j in -2..2) {
-            var s = ""
-            for (i in 0..4) {
-                s += if (tm.headX == i && tm.headY == j) "[" else " "
-                s += when (field[i, j]) {
-                    Alphabet.ZERO -> "0"
-                    Alphabet.ONE -> "1"
-                    else -> "_"
-                }
-                s += if (tm.headX == i && tm.headY == j) "]" else " "
-            }
-            text += s + "\n"
-        }
-        textView.text = text
-    }
-
     private fun initTM() {
         field = TMMap2D()
-        field[0, 0] = Alphabet.ZERO
-        field[1, 0] = Alphabet.ZERO
-        field[2, 0] = Alphabet.ONE
+        field[0, -2] = Alphabet.ZERO
+        field[4, -2] = Alphabet.ZERO
+        field[4, 2] = Alphabet.ZERO
+        field[0, 2] = Alphabet.ZERO
         tm = TuringMachine2D(program, field)
+
+        fieldView.field = field
+        fieldView.tm = tm
+    }
+
+    private fun drawField() {
+        fieldView.invalidate()
     }
 
     private fun runTMDemo() {
@@ -52,10 +50,11 @@ class MainActivity : AppCompatActivity() {
             GlobalScope.launch(Dispatchers.Main) {
                 initTM()
                 while (!tm.isOver()) {
+                    drawField()
+                    delay(250L)
                     tm.step()
-                    drawFieldDemo()
-                    delay(500L)
                 }
+                drawField()
                 ready = true
                 button.text = "RUN"
             }
@@ -67,7 +66,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initTM()
-        drawFieldDemo()
+        drawField()
+
         button.setOnClickListener { runTMDemo() }
     }
 }
