@@ -1,13 +1,18 @@
 package ru.hse.tm2d.model
 
-sealed class Instruction
-object Left: Instruction()
-object Right: Instruction()
-object Up: Instruction()
-object Down: Instruction()
-data class Write(val value: TMAlphabet): Instruction()
-object Return: Instruction()
-data class Goto(val label: Int): Instruction()
-data class If(val value: TMAlphabet, val label: Int): Instruction()
+enum class Direction {
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN,
+    NONE
+}
 
-typealias TM2DProgram = List<Instruction>
+const val TERMINAL_STATE = -1
+data class Action(val write: Alphabet, val move: Direction, val newState: Int)
+
+fun terminate(value: Alphabet): Action {
+    return Action(value, Direction.NONE, TERMINAL_STATE)
+}
+
+typealias TM2DProgram = List<Map<Alphabet, Action>>

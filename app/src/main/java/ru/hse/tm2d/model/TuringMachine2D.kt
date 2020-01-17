@@ -2,7 +2,7 @@ package ru.hse.tm2d.model
 
 import java.lang.Exception
 
-enum class TMAlphabet {
+enum class Alphabet {
     ZERO,
     ONE,
     BLANK
@@ -15,27 +15,25 @@ class TuringMachine2D(val program: TM2DProgram, val field: TMMap2D = TMMap2D()) 
         private set
     var headY: Int = 0
         private set
-    var instrPointer: Int = 0
-        private set
-    var isOver: Boolean = false
+    var state: Int = 0
         private set
 
+    fun isOver(): Boolean {
+        return state == TERMINAL_STATE
+    }
+
     fun step() {
-        if (isOver) throw ProgramEndedException()
-        when (val instr = program[instrPointer++]) {
-            is Left -> headX--
-            is Right -> headX++
-            is Up -> headY++
-            is Down -> headY--
-            is Write -> field[headX, headY] = instr.value
-            is Return -> isOver = true
-            is Goto -> instrPointer = instr.label
-            is If ->  {
-                if (field[headX, headY] == instr.value) { instrPointer = instr.label }
-            }
+        if (isOver()) throw ProgramEndedException()
+        val symbol = field[headX, headY]
+        val action = program[state][symbol] ?: terminate(symbol)
+        field[headX, headY] = action.write
+        when (action.move) {
+            Direction.LEFT -> headX--
+            Direction.RIGHT -> headX++
+            Direction.UP -> headY++
+            Direction.DOWN -> headY--
+            else -> {}
         }
-        if (instrPointer >= program.size) {
-            isOver = true
-        }
+        state = action.newState
     }
 }

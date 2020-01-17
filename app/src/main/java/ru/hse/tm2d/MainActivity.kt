@@ -14,11 +14,8 @@ class MainActivity : AppCompatActivity() {
 
     private var field = TMMap2D()
     private val program = listOf(
-        If(TMAlphabet.ONE, 4),
-        Write(TMAlphabet.ONE),
-        Right,
-        Goto(0),
-        Return
+        mapOf(Alphabet.ZERO to Action(Alphabet.ONE, Direction.RIGHT, 0),
+              Alphabet.ONE to Action(Alphabet.ONE, Direction.NONE, TERMINAL_STATE))
     )
     private var tm = TuringMachine2D(program, field)
 
@@ -29,8 +26,8 @@ class MainActivity : AppCompatActivity() {
             for (i in 0..4) {
                 s += if (tm.headX == i && tm.headY == j) "[" else " "
                 s += when (field[i, j]) {
-                    TMAlphabet.ZERO -> "0"
-                    TMAlphabet.ONE -> "1"
+                    Alphabet.ZERO -> "0"
+                    Alphabet.ONE -> "1"
                     else -> "_"
                 }
                 s += if (tm.headX == i && tm.headY == j) "]" else " "
@@ -42,9 +39,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun initTM() {
         field = TMMap2D()
-        field[0, 0] = TMAlphabet.ZERO
-        field[1, 0] = TMAlphabet.ZERO
-        field[2, 0] = TMAlphabet.ONE
+        field[0, 0] = Alphabet.ZERO
+        field[1, 0] = Alphabet.ZERO
+        field[2, 0] = Alphabet.ONE
         tm = TuringMachine2D(program, field)
     }
 
@@ -54,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             button.text = "RUNNING"
             GlobalScope.launch(Dispatchers.Main) {
                 initTM()
-                while (!tm.isOver) {
+                while (!tm.isOver()) {
                     tm.step()
                     drawFieldDemo()
                     delay(500L)

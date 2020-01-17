@@ -1,33 +1,33 @@
 package ru.hse.tm2d.model
 
-class TMMap2D(): Field2D<TMAlphabet> {
-    private val map = HashMap<Pair<Int, Int>, TMAlphabet>()
+class TMMap2D(): Field2D<Alphabet> {
+    private val map = HashMap<Pair<Int, Int>, Alphabet>()
 
-    constructor(values: List<Cell<TMAlphabet>>) : this() {
+    constructor(values: List<Cell<Alphabet>>) : this() {
         for (cell in values) {
             map[cell.x to cell.y] = cell.value
         }
     }
 
-    override fun set(x: Int, y: Int, value: TMAlphabet) {
-        if (value == TMAlphabet.BLANK) {
+    override fun set(x: Int, y: Int, value: Alphabet) {
+        if (value == Alphabet.BLANK) {
             map.remove(x to y)
         } else {
             map[x to y] = value
         }
     }
 
-    override fun get(x: Int, y: Int): TMAlphabet {
-        return map[x to y] ?: TMAlphabet.BLANK
+    override fun get(x: Int, y: Int): Alphabet {
+        return map[x to y] ?: Alphabet.BLANK
     }
 
-    override fun rectangleIterator(startX: Int, startY: Int, endX: Int, endY: Int): Iterator<Cell<TMAlphabet>> {
-        return object : Iterator<Cell<TMAlphabet>> {
+    override fun rectangleIterator(startX: Int, startY: Int, endX: Int, endY: Int): Iterator<Cell<Alphabet>> {
+        return object : Iterator<Cell<Alphabet>> {
             var x = startX
             var y = startY
 
             override fun hasNext(): Boolean {
-                while (get(x, y) == TMAlphabet.BLANK) {
+                while (get(x, y) == Alphabet.BLANK) {
                     x++
                     if (x >= endX) {
                         x = startX
@@ -39,7 +39,7 @@ class TMMap2D(): Field2D<TMAlphabet> {
                 return true
             }
 
-            override fun next(): Cell<TMAlphabet> {
+            override fun next(): Cell<Alphabet> {
                 if (!hasNext())
                     throw NoSuchElementException()
                 val result = Cell(x, y, get(x, y))
